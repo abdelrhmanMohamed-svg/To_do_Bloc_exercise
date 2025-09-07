@@ -3,10 +3,11 @@ import 'package:bloc_exercise/utilities/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'tasks_state.dart';
 
-class TasksCubit extends Cubit<TasksState> {
+class TasksCubit extends HydratedCubit<TasksState> {
   TasksCubit() : super(TasksInitial());
 
   void addTask(String title) {
@@ -35,5 +36,25 @@ class TasksCubit extends Cubit<TasksState> {
     }).toList();
 
     emit(UpdateTask(newTasks));
+  }
+
+  @override
+  TasksState? fromJson(Map<String, dynamic> json) {
+    return UpdateTask((json["tasks"] as List<dynamic>)
+        .map(
+          (task) => TaskModel.fromMap(task),
+        )
+        .toList());
+  }
+
+  @override
+  Map<String, dynamic>? toJson(TasksState state) {
+    return {
+      "tasks": state.tasks
+          .map(
+            (task) => task.toMap(),
+          )
+          .toList()
+    };
   }
 }
